@@ -24,6 +24,7 @@ export interface SlideData {
     stiffness: number;
     damping: number;
     mass: number;
+    yOffset?: number;
     xAxisLabel?: string;
     yAxisLabel?: string;
   };

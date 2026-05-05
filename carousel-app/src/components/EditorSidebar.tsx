@@ -219,7 +219,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                             >
                               <line x1="0" y1="30" x2="100" y2="30" stroke="white" strokeOpacity="0.05" />
                               <line x1="50" y1="0" x2="50" y2="60" stroke="white" strokeOpacity="0.05" />
-                              <path d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 15, slide.chartData?.mass || 1, 100, 60)} fill="none" stroke="#18a0fb" strokeWidth="2" />
+                              <path d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 15, slide.chartData?.mass || 1, 100, 60, slide.chartData?.yOffset || 0)} fill="none" stroke="#18a0fb" strokeWidth="2" />
                               <circle cx={slide.chartData?.damping || 15} cy={60 - ((slide.chartData?.stiffness || 100) / 3.3)} r="4" fill="#18a0fb" />
                             </svg>
                           </div>
@@ -243,6 +243,22 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                                 className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-1.5 text-[11px] text-white outline-none"
                               />
                             </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <div className="flex justify-between items-center">
+                              <label className="text-[10px] uppercase font-bold text-[#888]">Vertical Position</label>
+                              <span className="text-[10px] text-[#18a0fb] font-mono">{slide.chartData?.yOffset || 0}%</span>
+                            </div>
+                            <input 
+                              type="range" 
+                              min="-40" 
+                              max="40" 
+                              step="1"
+                              value={slide.chartData?.yOffset || 0} 
+                              onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, yOffset: parseInt(e.target.value) } as any })}
+                              className="w-full h-1.5 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#18a0fb]"
+                            />
                           </div>
 
                           <div className="space-y-1.5">
