@@ -9,12 +9,16 @@ interface SlideProps {
   onUpdate?: (updates: Partial<SlideData>) => void;
 }
 
-export const getSpringPath = (stiffness: number, damping: number, mass: number, width: number, height: number, yOffset: number = 0) => {
-  const shift = (yOffset / 100) * height;
-  const startY = (height * 0.8) - shift;
-  const endY = (height * 0.2) - shift;
-  const controlX = (damping / 50) * width;
-  const controlY = (height - (stiffness / 200) * height + (mass * 5)) - shift;
+export const getSpringPath = (stiffness: number, damping: number, mass: number, width: number, height: number, startYOffset: number = 0, endYOffset: number = 0) => {
+  const startShift = (startYOffset / 100) * height;
+  const endShift = (endYOffset / 100) * height;
+  
+  const startY = (height * 0.8) - startShift;
+  const endY = (height * 0.8) - endShift; // Default both to same baseline for intuitive control
+  
+  const controlX = (damping / 100) * width;
+  const controlY = (height * 0.8) - (stiffness / 100) * height - ((startShift + endShift) / 2);
+  
   return `M 0 ${startY} Q ${controlX} ${controlY} ${width} ${endY}`;
 };
 
@@ -171,7 +175,7 @@ const Slide: React.FC<SlideProps> = ({ slide, designSystem, index, totalSlides, 
                     <line key={i} x1="0" y1={i * 100 + 50} x2="1000" y2={i * 100 + 50} stroke="white" strokeOpacity="0.05" strokeWidth="2" />
                   ))}
                   <path 
-                    d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 15, slide.chartData?.mass || 1, 1000, 400, slide.chartData?.yOffset || 0)} 
+                    d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 50, slide.chartData?.mass || 1, 1000, 400, slide.chartData?.startYOffset || 0, slide.chartData?.endYOffset || 0)} 
                     fill="none" stroke="url(#curveGradient)" strokeWidth="14" strokeLinecap="round" className="opacity-90 shadow-2xl"
                   />
                   <line x1="0" y1="380" x2="1000" y2="380" stroke="white" strokeOpacity="0.2" strokeWidth="4" />

@@ -206,21 +206,21 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                             <svg 
                               viewBox="0 0 100 60" 
                               className="w-full h-full p-4 overflow-visible"
-                              onMouseMove={(e) => {
-                                if (e.buttons === 1) {
-                                  const rect = e.currentTarget.getBoundingClientRect();
-                                  const x = ((e.clientX - rect.left) / rect.width) * 100;
-                                  const y = 60 - (((e.clientY - rect.top) / rect.height) * 60);
-                                  const damping = Math.max(5, Math.min(95, x));
-                                  const stiffness = Math.max(10, Math.min(190, y * 3.3));
-                                  updateSlide(slide.id, { chartData: { ...slide.chartData, damping, stiffness } as any });
-                                }
-                              }}
-                            >
-                              <line x1="0" y1="30" x2="100" y2="30" stroke="white" strokeOpacity="0.05" />
-                              <line x1="50" y1="0" x2="50" y2="60" stroke="white" strokeOpacity="0.05" />
-                              <path d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 15, slide.chartData?.mass || 1, 100, 60, slide.chartData?.yOffset || 0)} fill="none" stroke="#18a0fb" strokeWidth="2" />
-                              <circle cx={slide.chartData?.damping || 15} cy={60 - ((slide.chartData?.stiffness || 100) / 3.3)} r="4" fill="#18a0fb" />
+                               onMouseMove={(e) => {
+                                 if (e.buttons === 1) {
+                                   const rect = e.currentTarget.getBoundingClientRect();
+                                   const x = ((e.clientX - rect.left) / rect.width) * 100;
+                                   const y = 60 - (((e.clientY - rect.top) / rect.height) * 60);
+                                   const damping = Math.max(0, Math.min(100, x));
+                                   const stiffness = Math.max(0, Math.min(100, y * (100 / 60)));
+                                   updateSlide(slide.id, { chartData: { ...slide.chartData, damping, stiffness } as any });
+                                 }
+                               }}
+                             >
+                               <line x1="0" y1="30" x2="100" y2="30" stroke="white" strokeOpacity="0.05" />
+                               <line x1="50" y1="0" x2="50" y2="60" stroke="white" strokeOpacity="0.05" />
+                               <path d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 50, slide.chartData?.mass || 1, 100, 60, slide.chartData?.startYOffset || 0, slide.chartData?.endYOffset || 0)} fill="none" stroke="#18a0fb" strokeWidth="2" />
+                               <circle cx={slide.chartData?.damping || 50} cy={60 - ((slide.chartData?.stiffness || 100) * 0.6)} r="4" fill="#18a0fb" />
                             </svg>
                           </div>
 
@@ -245,20 +245,37 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                             </div>
                           </div>
 
-                          <div className="space-y-1.5">
-                            <div className="flex justify-between items-center">
-                              <label className="text-[10px] uppercase font-bold text-[#888]">Vertical Position</label>
-                              <span className="text-[10px] text-[#18a0fb] font-mono">{slide.chartData?.yOffset || 0}%</span>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between items-center">
+                                <label className="text-[10px] uppercase font-bold text-[#888]">Start Height</label>
+                                <span className="text-[10px] text-[#18a0fb] font-mono">{slide.chartData?.startYOffset || 0}%</span>
+                              </div>
+                              <input 
+                                type="range" 
+                                min="-40" 
+                                max="60" 
+                                step="1"
+                                value={slide.chartData?.startYOffset || 0} 
+                                onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, startYOffset: parseInt(e.target.value) } as any })}
+                                className="w-full h-1.5 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#18a0fb]"
+                              />
                             </div>
-                            <input 
-                              type="range" 
-                              min="-40" 
-                              max="40" 
-                              step="1"
-                              value={slide.chartData?.yOffset || 0} 
-                              onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, yOffset: parseInt(e.target.value) } as any })}
-                              className="w-full h-1.5 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#18a0fb]"
-                            />
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between items-center">
+                                <label className="text-[10px] uppercase font-bold text-[#888]">End Height</label>
+                                <span className="text-[10px] text-[#18a0fb] font-mono">{slide.chartData?.endYOffset || 0}%</span>
+                              </div>
+                              <input 
+                                type="range" 
+                                min="-40" 
+                                max="60" 
+                                step="1"
+                                value={slide.chartData?.endYOffset || 0} 
+                                onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, endYOffset: parseInt(e.target.value) } as any })}
+                                className="w-full h-1.5 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#18a0fb]"
+                              />
+                            </div>
                           </div>
 
                           <div className="space-y-1.5">
