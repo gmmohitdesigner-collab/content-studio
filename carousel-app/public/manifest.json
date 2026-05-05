@@ -1,0 +1,15 @@
+{
+  "short_name": "Studio",
+  "name": "GMMohit Content Studio",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#3f352c",
+  "background_color": "#3f352c"
+}
