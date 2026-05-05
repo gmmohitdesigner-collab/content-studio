@@ -189,15 +189,6 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                         </select>
                       </div>
 
-                      {slide.layoutType === 'chart' && (
-                        <div className="space-y-4 p-4 bg-[#1e1e1e] rounded-lg border border-[#444]">
-                           <svg ref={curvePreviewRef} viewBox="0 0 100 60" className="w-full h-32 overflow-visible" onMouseDown={() => setIsDraggingCurve(slide.id)}>
-                              <path d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 15, slide.chartData?.mass || 1, 100, 60)} fill="none" stroke="#18a0fb" strokeWidth="2" />
-                              <circle cx={(slide.chartData?.damping || 15) / 50 * 100} cy={60 - (slide.chartData?.stiffness || 100) / 200 * 60} r="3" fill="white" />
-                           </svg>
-                        </div>
-                      )}
-
                       <div className="space-y-1.5">
                         <label className="text-[10px] uppercase font-bold text-[#888] tracking-widest">Headline</label>
                         <input 
@@ -208,7 +199,63 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                         />
                       </div>
 
-                      {slide.layoutType === 'romina-table' ? (
+                      {slide.layoutType === 'chart' ? (
+                        <div className="space-y-6">
+                          <label className="text-[10px] uppercase font-bold text-[#888] tracking-widest">Curve Sculptor</label>
+                          <div className="relative aspect-[16/9] bg-[#1a1a1a] rounded-lg border border-[#444] overflow-hidden group/sculptor cursor-crosshair">
+                            <svg 
+                              viewBox="0 0 100 60" 
+                              className="w-full h-full p-4 overflow-visible"
+                              onMouseMove={(e) => {
+                                if (e.buttons === 1) {
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  const x = ((e.clientX - rect.left) / rect.width) * 100;
+                                  const y = 60 - (((e.clientY - rect.top) / rect.height) * 60);
+                                  const damping = Math.max(5, Math.min(95, x));
+                                  const stiffness = Math.max(10, Math.min(190, y * 3.3));
+                                  updateSlide(slide.id, { chartData: { ...slide.chartData, damping, stiffness } as any });
+                                }
+                              }}
+                            >
+                              <line x1="0" y1="30" x2="100" y2="30" stroke="white" strokeOpacity="0.05" />
+                              <line x1="50" y1="0" x2="50" y2="60" stroke="white" strokeOpacity="0.05" />
+                              <path d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 15, slide.chartData?.mass || 1, 100, 60)} fill="none" stroke="#18a0fb" strokeWidth="2" />
+                              <circle cx={slide.chartData?.damping || 15} cy={60 - ((slide.chartData?.stiffness || 100) / 3.3)} r="4" fill="#18a0fb" />
+                            </svg>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] uppercase font-bold text-[#888]">Y-Axis Label</label>
+                              <input 
+                                type="text" 
+                                value={slide.chartData?.yAxisLabel || ''} 
+                                onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, yAxisLabel: e.target.value.toUpperCase() } as any })}
+                                className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-1.5 text-[11px] text-white outline-none"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] uppercase font-bold text-[#888]">X-Axis Label</label>
+                              <input 
+                                type="text" 
+                                value={slide.chartData?.xAxisLabel || ''} 
+                                onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, xAxisLabel: e.target.value.toUpperCase() } as any })}
+                                className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-1.5 text-[11px] text-white outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] uppercase font-bold text-[#888] tracking-widest">Insight Caption</label>
+                            <textarea 
+                              value={slide.content} 
+                              onChange={(e) => updateSlide(slide.id, { content: e.target.value })} 
+                              rows={3}
+                              className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[12px] outline-none text-white font-circular resize-none leading-relaxed transition-all focus:border-[#666]" 
+                            />
+                          </div>
+                        </div>
+                      ) : slide.layoutType === 'romina-table' ? (
                         <div className="space-y-4">
                           <label className="text-[10px] uppercase font-bold text-[#888] tracking-widest">Table Data</label>
                           <div className="grid grid-cols-2 gap-2">
