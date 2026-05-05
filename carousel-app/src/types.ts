@@ -23,7 +23,6 @@ export interface SlideData {
   chartData?: {
     stiffness: number;
     damping: number;
-    mass: number;
     startYOffset?: number;
     endYOffset?: number;
     xAxisLabel?: string;

@@ -54,8 +54,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
       showGrid: true,
       chartData: {
         stiffness: 100,
-        damping: 15,
-        mass: 1,
+        damping: 50,
         xAxisLabel: 'RETENTION',
         yAxisLabel: '100%'
       }
@@ -219,7 +218,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                              >
                                <line x1="0" y1="30" x2="100" y2="30" stroke="white" strokeOpacity="0.05" />
                                <line x1="50" y1="0" x2="50" y2="60" stroke="white" strokeOpacity="0.05" />
-                               <path d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 50, slide.chartData?.mass || 1, 100, 60, slide.chartData?.startYOffset || 0, slide.chartData?.endYOffset || 0)} fill="none" stroke="#18a0fb" strokeWidth="2" />
+                               <path d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 50, 100, 60, slide.chartData?.startYOffset || 0, slide.chartData?.endYOffset || 0)} fill="none" stroke="#18a0fb" strokeWidth="2" />
                                <circle cx={slide.chartData?.damping || 50} cy={60 - ((slide.chartData?.stiffness || 100) * 0.6)} r="4" fill="#18a0fb" />
                             </svg>
                           </div>

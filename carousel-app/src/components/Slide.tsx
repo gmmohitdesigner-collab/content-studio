@@ -9,7 +9,7 @@ interface SlideProps {
   onUpdate?: (updates: Partial<SlideData>) => void;
 }
 
-export const getSpringPath = (stiffness: number, damping: number, mass: number, width: number, height: number, startYOffset: number = 0, endYOffset: number = 0) => {
+export const getSpringPath = (stiffness: number, damping: number, width: number, height: number, startYOffset: number = 0, endYOffset: number = 0) => {
   const startShift = (startYOffset / 100) * height;
   const endShift = (endYOffset / 100) * height;
   
@@ -175,7 +175,7 @@ const Slide: React.FC<SlideProps> = ({ slide, designSystem, index, totalSlides, 
                     <line key={i} x1="0" y1={i * 100 + 50} x2="1000" y2={i * 100 + 50} stroke="white" strokeOpacity="0.05" strokeWidth="2" />
                   ))}
                   <path 
-                    d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 50, slide.chartData?.mass || 1, 1000, 400, slide.chartData?.startYOffset || 0, slide.chartData?.endYOffset || 0)} 
+                    d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 50, 1000, 400, slide.chartData?.startYOffset || 0, slide.chartData?.endYOffset || 0)} 
                     fill="none" stroke="url(#curveGradient)" strokeWidth="14" strokeLinecap="round" className="opacity-90 shadow-2xl"
                   />
                   <line x1="0" y1="380" x2="1000" y2="380" stroke="white" strokeOpacity="0.2" strokeWidth="4" />
