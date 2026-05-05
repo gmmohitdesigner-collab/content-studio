@@ -208,15 +208,90 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                         />
                       </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] uppercase font-bold text-[#888] tracking-widest">Body Paragraph</label>
-                        <textarea 
-                          value={slide.content} 
-                          onChange={(e) => updateSlide(slide.id, { content: e.target.value })} 
-                          rows={4}
-                          className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[13px] outline-none text-white font-circular resize-none leading-relaxed transition-all focus:border-[#666]" 
-                        />
-                      </div>
+                      {slide.layoutType === 'romina-table' ? (
+                        <div className="space-y-4">
+                          <label className="text-[10px] uppercase font-bold text-[#888] tracking-widest">Table Data</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input 
+                              type="text" 
+                              placeholder="Header A"
+                              value={slide.tableData?.headers?.[0] || ''} 
+                              onChange={(e) => {
+                                const newHeaders = [...(slide.tableData?.headers || ['', ''])];
+                                newHeaders[0] = e.target.value.toUpperCase();
+                                updateSlide(slide.id, { tableData: { ...slide.tableData, headers: newHeaders } as any });
+                              }}
+                              className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[11px] font-bold text-[#18a0fb] outline-none"
+                            />
+                            <input 
+                              type="text" 
+                              placeholder="Header B"
+                              value={slide.tableData?.headers?.[1] || ''} 
+                              onChange={(e) => {
+                                const newHeaders = [...(slide.tableData?.headers || ['', ''])];
+                                newHeaders[1] = e.target.value.toUpperCase();
+                                updateSlide(slide.id, { tableData: { ...slide.tableData, headers: newHeaders } as any });
+                              }}
+                              className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[11px] font-bold text-[#18a0fb] outline-none"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            {(slide.tableData?.rows || [['', '']]).map((row, i) => (
+                              <div key={i} className="grid grid-cols-2 gap-2 group/row relative">
+                                <input 
+                                  type="text" 
+                                  value={row[0]} 
+                                  onChange={(e) => {
+                                    const newRows = [...(slide.tableData?.rows || [])];
+                                    newRows[i] = [e.target.value, row[1]];
+                                    updateSlide(slide.id, { tableData: { ...slide.tableData, rows: newRows } as any });
+                                  }}
+                                  className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[12px] text-white/80 outline-none"
+                                />
+                                <input 
+                                  type="text" 
+                                  value={row[1]} 
+                                  onChange={(e) => {
+                                    const newRows = [...(slide.tableData?.rows || [])];
+                                    newRows[i] = [row[0], e.target.value];
+                                    updateSlide(slide.id, { tableData: { ...slide.tableData, rows: newRows } as any });
+                                  }}
+                                  className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[12px] text-white/80 outline-none"
+                                />
+                                <button 
+                                  onClick={() => {
+                                    const newRows = (slide.tableData?.rows || []).filter((_, rowIndex) => rowIndex !== i);
+                                    updateSlide(slide.id, { tableData: { ...slide.tableData, rows: newRows } as any });
+                                  }}
+                                  className="absolute -right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover/row:opacity-100 p-1 text-red-500/50 hover:text-red-500 transition-all"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ))}
+                            <button 
+                              onClick={() => {
+                                const newRows = [...(slide.tableData?.rows || []), ['', '']];
+                                updateSlide(slide.id, { tableData: { ...slide.tableData, rows: newRows } as any });
+                              }}
+                              className="w-full py-2 border border-dashed border-[#444] rounded text-[10px] font-bold text-[#888] hover:text-white hover:border-[#666] transition-all uppercase tracking-widest"
+                            >
+                              + Add Row
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] uppercase font-bold text-[#888] tracking-widest">Body Paragraph</label>
+                          <textarea 
+                            value={slide.content} 
+                            onChange={(e) => updateSlide(slide.id, { content: e.target.value })} 
+                            rows={4}
+                            className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[13px] outline-none text-white font-circular resize-none leading-relaxed transition-all focus:border-[#666]" 
+                          />
+                        </div>
+                      )}
 
                       {/* NEW: DEDICATED SLIDE ACTIONS SECTION */}
                       <div className="pt-4 mt-4 border-t border-[#444] space-y-3">
