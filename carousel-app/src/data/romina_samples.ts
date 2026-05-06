@@ -23,7 +23,6 @@ export const rominaSamples: SlideData[] = [
     chartData: {
       stiffness: 120,
       damping: 12,
-      mass: 2,
       xAxisLabel: 'COMPLEXITY',
       yAxisLabel: 'DROP-OFF'
     },
