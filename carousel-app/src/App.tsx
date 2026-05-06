@@ -4,7 +4,6 @@ import EditorSidebar from './components/EditorSidebar';
 import CarouselCanvas from './components/CarouselCanvas';
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
-// FULL TYPES RESTORED
 interface SlideData {
   id: string;
   title: string;
@@ -15,8 +14,10 @@ interface SlideData {
   image?: string;
   showGrid?: boolean;
   panoramaMode?: boolean;
+  titleSize?: number;
+  contentSize?: number;
   tableData?: { headers: string[]; rows: string[][]; };
-  chartData?: { stiffness: number; damping: number; mass: number; xAxisLabel?: string; yAxisLabel?: string; };
+  chartData?: { stiffness: number; damping: number; mass?: number; xAxisLabel?: string; yAxisLabel?: string; xStartLabel?: string; xEndLabel?: string; strokeWidth?: number; fillOpacity?: number; startYOffset?: number; endYOffset?: number; };
 }
 
 interface DesignSystem {
@@ -27,6 +28,7 @@ interface DesignSystem {
   showGlobalGrid: boolean;
   gridColor: string;
   gridStroke: number;
+  backgroundColor: string;
 }
 
 // FULL FIDELITY SAMPLES
@@ -103,7 +105,11 @@ const DEFAULT_DESIGN: DesignSystem = {
   showGlobalGrid: true,
   gridColor: '#fcf5ee',
   gridStroke: 1,
+  backgroundColor: '#3f352c',
 };
+
+const THEME_DARK  = { backgroundColor: '#3f352c', primaryColor: '#fcf5ee', primaryLight: '#ffffff', primaryDark: '#d1c7bc', gridColor: '#fcf5ee' };
+const THEME_LIGHT = { backgroundColor: '#fcf5ee', primaryColor: '#3f352c', primaryLight: '#5c4f43', primaryDark: '#8c7d72', gridColor: '#3f352c' };
 
 const STORAGE_KEY_SLIDES = 'carousel_generator_slides_v6';
 const STORAGE_KEY_DESIGN = 'carousel_generator_design_v6';
@@ -140,6 +146,7 @@ function App() {
     root.style.setProperty('--color-primary-hex', designSystem.primaryColor);
     root.style.setProperty('--color-primary-light-hex', designSystem.primaryLight);
     root.style.setProperty('--color-primary-dark-hex', designSystem.primaryDark);
+    root.style.setProperty('--color-brand-bg-hex', designSystem.backgroundColor || '#3f352c');
   }, [designSystem]);
 
   const updateSlide = (id: string, updates: Partial<SlideData>) => {
@@ -196,11 +203,21 @@ function App() {
       </div>
 
       <main className="flex-1 relative overflow-hidden flex flex-col">
-        <div className="h-10 bg-[#252526] border-b border-[#333] flex items-center px-4 z-50">
-           <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="text-[#858585] hover:text-white transition-colors">
-             {sidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
-           </button>
-           <div className="ml-4 text-[11px] text-[#858585] uppercase tracking-widest font-bold">GMMohit Content Studio — v4.0</div>
+        <div className="h-10 bg-[#252526] border-b border-[#333] flex items-center px-4 z-50 gap-4">
+          <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="text-[#858585] hover:text-white transition-colors flex-shrink-0">
+            {sidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
+          </button>
+          <div className="text-[11px] text-[#858585] uppercase tracking-widest font-bold flex-shrink-0">GMMohit Content Studio — v4.0</div>
+          <div className="ml-auto flex items-center gap-1 bg-[#1a1a1a] border border-[#333] rounded p-0.5">
+            <button
+              onClick={() => setDesignSystem(prev => ({ ...prev, ...THEME_DARK }))}
+              className={`px-3 py-1 rounded text-[10px] font-bold uppercase tracking-widest transition-all ${designSystem.backgroundColor === '#fcf5ee' ? 'text-[#555]' : 'bg-[#3f352c] text-[#fcf5ee]'}`}
+            >Dark</button>
+            <button
+              onClick={() => setDesignSystem(prev => ({ ...prev, ...THEME_LIGHT }))}
+              className={`px-3 py-1 rounded text-[10px] font-bold uppercase tracking-widest transition-all ${designSystem.backgroundColor === '#fcf5ee' ? 'bg-[#fcf5ee] text-[#3f352c]' : 'text-[#555]'}`}
+            >Light</button>
+          </div>
         </div>
 
         <CarouselCanvas 

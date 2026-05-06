@@ -10,6 +10,13 @@ import { toPng } from 'html-to-image';
 import type { SlideData, DesignSystem, MediaItem } from '../types';
 import { getSpringPath } from './Slide';
 
+const getDefaultTitleSize = (layoutType?: string) => {
+  const sizes: Record<string, number> = {
+    'romina-hook': 160, 'romina-sticky': 110, 'romina-table': 72, 'chart': 80,
+  };
+  return sizes[layoutType || ''] ?? 120;
+};
+
 interface EditorSidebarProps {
   slides: SlideData[];
   designSystem: DesignSystem;
@@ -188,13 +195,45 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                         </select>
                       </div>
 
+                      {/* Font size controls */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] uppercase font-bold text-[#888]">Headline Size</label>
+                          <div className="flex items-center gap-2 bg-[#1a1a1a] border border-[#333] rounded px-2 py-1.5">
+                            <button
+                              onClick={() => updateSlide(slide.id, { titleSize: Math.max(24, (slide.titleSize ?? getDefaultTitleSize(slide.layoutType)) - 4) })}
+                              className="text-[#888] hover:text-white w-5 h-5 flex items-center justify-center text-[16px] font-bold leading-none transition-colors"
+                            >−</button>
+                            <span className="flex-1 text-center text-[12px] text-white font-mono">{slide.titleSize ?? getDefaultTitleSize(slide.layoutType)}</span>
+                            <button
+                              onClick={() => updateSlide(slide.id, { titleSize: Math.min(240, (slide.titleSize ?? getDefaultTitleSize(slide.layoutType)) + 4) })}
+                              className="text-[#888] hover:text-white w-5 h-5 flex items-center justify-center text-[16px] font-bold leading-none transition-colors"
+                            >+</button>
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] uppercase font-bold text-[#888]">Body Size</label>
+                          <div className="flex items-center gap-2 bg-[#1a1a1a] border border-[#333] rounded px-2 py-1.5">
+                            <button
+                              onClick={() => updateSlide(slide.id, { contentSize: Math.max(16, (slide.contentSize ?? 44) - 2) })}
+                              className="text-[#888] hover:text-white w-5 h-5 flex items-center justify-center text-[16px] font-bold leading-none transition-colors"
+                            >−</button>
+                            <span className="flex-1 text-center text-[12px] text-white font-mono">{slide.contentSize ?? 44}</span>
+                            <button
+                              onClick={() => updateSlide(slide.id, { contentSize: Math.min(100, (slide.contentSize ?? 44) + 2) })}
+                              className="text-[#888] hover:text-white w-5 h-5 flex items-center justify-center text-[16px] font-bold leading-none transition-colors"
+                            >+</button>
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="space-y-1.5">
                         <label className="text-[10px] uppercase font-bold text-[#888] tracking-widest">Headline</label>
-                        <input 
-                          type="text" 
-                          value={slide.title} 
-                          onChange={(e) => updateSlide(slide.id, { title: e.target.value.toUpperCase() })} 
-                          className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[14px] outline-none text-white font-monument transition-all focus:border-[#666]" 
+                        <input
+                          type="text"
+                          value={slide.title}
+                          onChange={(e) => updateSlide(slide.id, { title: e.target.value.toUpperCase() })}
+                          className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[14px] outline-none text-white font-monument transition-all focus:border-[#666]"
                         />
                       </div>
 
@@ -202,16 +241,16 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                         <div className="space-y-6">
                           <label className="text-[10px] uppercase font-bold text-[#888] tracking-widest">Curve Sculptor</label>
                           <div className="relative aspect-[16/9] bg-[#1a1a1a] rounded-lg border border-[#444] overflow-hidden group/sculptor cursor-crosshair">
-                            <svg 
-                              viewBox="0 0 100 60" 
+                            <svg
+                              viewBox="0 0 100 60"
                               className="w-full h-full p-4 overflow-visible"
                                onMouseMove={(e) => {
                                  if (e.buttons === 1) {
                                    const rect = e.currentTarget.getBoundingClientRect();
-                                   const x = ((e.clientX - rect.left) / rect.width) * 100;
+                                   const x = ((e.clientX - rect.left) / rect.width) * 200;
                                    const y = 60 - (((e.clientY - rect.top) / rect.height) * 60);
-                                   const damping = Math.max(0, Math.min(100, x));
-                                   const stiffness = Math.max(0, Math.min(100, y * (100 / 60)));
+                                   const damping = Math.max(0, Math.min(200, x));
+                                   const stiffness = Math.max(0, Math.min(200, y * (200 / 60)));
                                    updateSlide(slide.id, { chartData: { ...slide.chartData, damping, stiffness } as any });
                                  }
                                }}
@@ -219,43 +258,99 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                                <line x1="0" y1="30" x2="100" y2="30" stroke="white" strokeOpacity="0.05" />
                                <line x1="50" y1="0" x2="50" y2="60" stroke="white" strokeOpacity="0.05" />
                                <path d={getSpringPath(slide.chartData?.stiffness || 100, slide.chartData?.damping || 50, 100, 60, slide.chartData?.startYOffset || 0, slide.chartData?.endYOffset || 0)} fill="none" stroke="#18a0fb" strokeWidth="2" />
-                               <circle cx={slide.chartData?.damping || 50} cy={60 - ((slide.chartData?.stiffness || 100) * 0.6)} r="4" fill="#18a0fb" />
+                               <circle cx={Math.min(100, (slide.chartData?.damping || 50) / 2)} cy={60 - ((slide.chartData?.stiffness || 100) / 200) * 60} r="4" fill="#18a0fb" />
                             </svg>
                           </div>
 
+                          {/* Stiffness + Damping sliders */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between items-center">
+                                <label className="text-[10px] uppercase font-bold text-[#888]">Stiffness</label>
+                                <span className="text-[10px] text-[#18a0fb] font-mono">{Math.round(slide.chartData?.stiffness || 100)}</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0" max="200" step="1"
+                                value={slide.chartData?.stiffness || 100}
+                                onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, stiffness: parseFloat(e.target.value) } as any })}
+                                className="w-full h-1.5 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#18a0fb]"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between items-center">
+                                <label className="text-[10px] uppercase font-bold text-[#888]">Damping</label>
+                                <span className="text-[10px] text-[#18a0fb] font-mono">{Math.round(slide.chartData?.damping || 50)}</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0" max="200" step="1"
+                                value={slide.chartData?.damping || 50}
+                                onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, damping: parseFloat(e.target.value) } as any })}
+                                className="w-full h-1.5 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#18a0fb]"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Axis labels */}
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                               <label className="text-[10px] uppercase font-bold text-[#888]">Y-Axis Label</label>
-                              <input 
-                                type="text" 
-                                value={slide.chartData?.yAxisLabel || ''} 
+                              <input
+                                type="text"
+                                value={slide.chartData?.yAxisLabel || ''}
                                 onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, yAxisLabel: e.target.value.toUpperCase() } as any })}
                                 className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-1.5 text-[11px] text-white outline-none"
                               />
                             </div>
                             <div className="space-y-1.5">
                               <label className="text-[10px] uppercase font-bold text-[#888]">X-Axis Label</label>
-                              <input 
-                                type="text" 
-                                value={slide.chartData?.xAxisLabel || ''} 
+                              <input
+                                type="text"
+                                value={slide.chartData?.xAxisLabel || ''}
                                 onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, xAxisLabel: e.target.value.toUpperCase() } as any })}
                                 className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-1.5 text-[11px] text-white outline-none"
                               />
                             </div>
                           </div>
 
+                          {/* X-tick labels */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] uppercase font-bold text-[#888]">X Start Label</label>
+                              <input
+                                type="text"
+                                placeholder="0:00"
+                                value={slide.chartData?.xStartLabel || ''}
+                                onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, xStartLabel: e.target.value } as any })}
+                                className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-1.5 text-[11px] text-white outline-none"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] uppercase font-bold text-[#888]">X End Label</label>
+                              <input
+                                type="text"
+                                placeholder="0:60"
+                                value={slide.chartData?.xEndLabel || ''}
+                                onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, xEndLabel: e.target.value } as any })}
+                                className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-1.5 text-[11px] text-white outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Start / End height */}
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                               <div className="flex justify-between items-center">
                                 <label className="text-[10px] uppercase font-bold text-[#888]">Start Height</label>
                                 <span className="text-[10px] text-[#18a0fb] font-mono">{slide.chartData?.startYOffset || 0}%</span>
                               </div>
-                              <input 
-                                type="range" 
-                                min="-40" 
-                                max="60" 
+                              <input
+                                type="range"
+                                min="-40"
+                                max="60"
                                 step="1"
-                                value={slide.chartData?.startYOffset || 0} 
+                                value={slide.chartData?.startYOffset || 0}
                                 onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, startYOffset: parseInt(e.target.value) } as any })}
                                 className="w-full h-1.5 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#18a0fb]"
                               />
@@ -265,13 +360,43 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                                 <label className="text-[10px] uppercase font-bold text-[#888]">End Height</label>
                                 <span className="text-[10px] text-[#18a0fb] font-mono">{slide.chartData?.endYOffset || 0}%</span>
                               </div>
-                              <input 
-                                type="range" 
-                                min="-40" 
-                                max="60" 
+                              <input
+                                type="range"
+                                min="-40"
+                                max="60"
                                 step="1"
-                                value={slide.chartData?.endYOffset || 0} 
+                                value={slide.chartData?.endYOffset || 0}
                                 onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, endYOffset: parseInt(e.target.value) } as any })}
+                                className="w-full h-1.5 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#18a0fb]"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Stroke width + Fill opacity */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between items-center">
+                                <label className="text-[10px] uppercase font-bold text-[#888]">Stroke Width</label>
+                                <span className="text-[10px] text-[#18a0fb] font-mono">{slide.chartData?.strokeWidth ?? 14}</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="2" max="30" step="1"
+                                value={slide.chartData?.strokeWidth ?? 14}
+                                onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, strokeWidth: parseInt(e.target.value) } as any })}
+                                className="w-full h-1.5 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#18a0fb]"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between items-center">
+                                <label className="text-[10px] uppercase font-bold text-[#888]">Fill Opacity</label>
+                                <span className="text-[10px] text-[#18a0fb] font-mono">{slide.chartData?.fillOpacity ?? 30}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0" max="100" step="1"
+                                value={slide.chartData?.fillOpacity ?? 30}
+                                onChange={(e) => updateSlide(slide.id, { chartData: { ...slide.chartData, fillOpacity: parseInt(e.target.value) } as any })}
                                 className="w-full h-1.5 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#18a0fb]"
                               />
                             </div>
@@ -279,11 +404,11 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
 
                           <div className="space-y-1.5">
                             <label className="text-[10px] uppercase font-bold text-[#888] tracking-widest">Insight Caption</label>
-                            <textarea 
-                              value={slide.content} 
-                              onChange={(e) => updateSlide(slide.id, { content: e.target.value })} 
+                            <textarea
+                              value={slide.content}
+                              onChange={(e) => updateSlide(slide.id, { content: e.target.value })}
                               rows={3}
-                              className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[12px] outline-none text-white font-circular resize-none leading-relaxed transition-all focus:border-[#666]" 
+                              className="w-full bg-[#2d2d2d] border border-[#404040] rounded px-3 py-2 text-[12px] outline-none text-white font-circular resize-none leading-relaxed transition-all focus:border-[#666]"
                             />
                           </div>
                         </div>

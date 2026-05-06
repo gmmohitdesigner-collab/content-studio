@@ -13,8 +13,10 @@ export interface SlideData {
   secondaryContent?: string;
   image?: string;
   panoramaMode?: boolean;
-  panoramaOffset?: number; // % offset for the background image
+  panoramaOffset?: number;
   showGrid?: boolean;
+  titleSize?: number;
+  contentSize?: number;
   layoutType?: 'editorial' | 'grid' | 'diagram' | 'default' | 'romina-hook' | 'romina-table' | 'romina-sticky' | 'chart' | 'image-focus';
   tableData?: {
     headers: string[];
@@ -27,6 +29,10 @@ export interface SlideData {
     endYOffset?: number;
     xAxisLabel?: string;
     yAxisLabel?: string;
+    xStartLabel?: string;
+    xEndLabel?: string;
+    strokeWidth?: number;
+    fillOpacity?: number;
   };
   diagramData?: {
     points: string[];
@@ -41,6 +47,7 @@ export interface DesignSystem {
   showGlobalGrid: boolean;
   gridColor: string;
   gridStroke: number;
+  backgroundColor: string;
 }
 
 export interface AppState {
